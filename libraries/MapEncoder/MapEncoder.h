@@ -12,13 +12,11 @@ class MapEncoder: public Encoder {
   public:
     int pinA = 3;
     int pinB = 4;
-    int pinSw = 2;
-
-    MapEncoder(int a, int b, int sw): Encoder(a, b) {
+    
+    MapEncoder(int a, int b): Encoder(a, b) {
       this->pinA = a;
       this->pinB = b;
-      this->pinSw = sw;
-      pinMode(pinSw, INPUT);
+ 
       this->_prevPosition = this->read();
       this->setScale();
     };
@@ -34,8 +32,6 @@ class MapEncoder: public Encoder {
 
     long getValue() {
       int pos = this->read();
-      int button = digitalRead(this->pinSw);
-
       int delta = pos - this->_prevPosition;
       this->_prevPosition = pos;
 
@@ -48,10 +44,7 @@ class MapEncoder: public Encoder {
       if (this->_value > this->_maxValue) {
         this->_value = this->_maxValue;
       }
-
-      if (button == LOW) {
-        this->_value = this->_initPos;
-      }
+      
       return this->_value;
     }
 };
