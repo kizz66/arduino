@@ -7,16 +7,23 @@
 
 const int CLK_PIN = 3;
 const int DT_PIN = 4;
+const int THORTTLE_PIN = 0;
+const int BUTTON_PIN = 5;
 
-int ledPin = 13;
 int data[3];
 long oldPosition  = 90;
+long oldThorttle  = 0;
+long newPosition;
+long newThorttle;
 
 RF24 radio(9, 10); // Создаём объект radio для работы с библиотекой RF24, указывая номера выводов nRF24L01+ (CE, CSN)
 MapEncoder encoder(3, 4);
 
 void setup() {
-  Serial.begin (9600);
+  pinMode(BUTTON_PIN, INPUT);
+  digitalWrite(BUTTON_PIN, HIGH);
+
+  //Serial.begin (9600);
   radio.begin();                                        // Инициируем работу nRF24L01+
   radio.setChannel(5);                                  // Указываем канал передачи данных (от 0 до 127), 5 - значит передача данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
   radio.setDataRate     (RF24_1MBPS);                   // Указываем скорость передачи данных (RF24_250KBPS, RF24_1MBPS, RF24_2MBPS), RF24_1MBPS - 1Мбит/сек
@@ -26,14 +33,16 @@ void setup() {
 }
 
 void loop() {
-  long newPosition = encoder.getValue();
-
-  if (newPosition != oldPosition) {
+  newPosition = encoder.getValue();
+  newThorttle = analogRead(THORTTLE_PIN);
+  if (newPosition != oldPosition || newThorttle != oldThorttle) {
     oldPosition = newPosition;
+    oldThorttle = newThorttle;
+
     data[0] = oldPosition;
-    data[1] = oldPosition;
-    data[2] = oldPosition;
+    data[1] = oldThorttle;
+    data[2] = LOW;
     radio.write(&data, sizeof(data));
   }
-  delay(100);
+  delay(10);
 }
