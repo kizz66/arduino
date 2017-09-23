@@ -4,13 +4,14 @@
 #include <MapEncoder.h>
 #include <nRF24L01.h>
 #include <RF24.h>
+#include <AnalogButtonTrigger.h>
 
 const int CLK_PIN = 3;
 const int DT_PIN = 4;
 const int THORTTLE_PIN = 0;
-const int BUTTON_PIN = 5;
+const int BUTTON_PIN = 2;// button read by analog input A2
 
-int data[3];
+int data[3], oldButton = LOW, newButton = LOW;
 long oldPosition  = 90;
 long oldThorttle  = 0;
 long newPosition;
@@ -18,11 +19,9 @@ long newThorttle;
 
 RF24 radio(9, 10); // Создаём объект radio для работы с библиотекой RF24, указывая номера выводов nRF24L01+ (CE, CSN)
 MapEncoder encoder(3, 4);
+AnalogButtonTrigger triggerButton = AnalogButtonTrigger(BUTTON_PIN);
 
 void setup() {
-  pinMode(BUTTON_PIN, INPUT);
-  digitalWrite(BUTTON_PIN, HIGH);
-
   //Serial.begin (9600);
   radio.begin();                                        // Инициируем работу nRF24L01+
   radio.setChannel(5);                                  // Указываем канал передачи данных (от 0 до 127), 5 - значит передача данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
@@ -35,13 +34,16 @@ void setup() {
 void loop() {
   newPosition = encoder.getValue();
   newThorttle = analogRead(THORTTLE_PIN);
-  if (newPosition != oldPosition || newThorttle != oldThorttle) {
+  newButton = triggerButton.check();
+  
+  if (newPosition != oldPosition || newThorttle != oldThorttle || oldButton != newButton) {
     oldPosition = newPosition;
     oldThorttle = newThorttle;
+    oldButton = newButton;
 
     data[0] = oldPosition;
     data[1] = oldThorttle;
-    data[2] = LOW;
+    data[2] = oldButton;
     radio.write(&data, sizeof(data));
   }
   delay(10);
