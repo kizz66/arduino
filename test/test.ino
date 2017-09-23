@@ -1,14 +1,19 @@
 #include <Wire.h>
+#include <AnalogButtonTrigger.h>
+
 const int ledPin = 13;
-const int pin = 8;
+const int buttonPin = 2;// button read by analog input
+
+AnalogButtonTrigger triggerButton = AnalogButtonTrigger(buttonPin);
+
 void setup() {
   Serial.begin (9600);
   pinMode(ledPin, OUTPUT);
-  pinMode(pin, INPUT);
-  digitalWrite(pin,HIGH);
 }
 
 void loop() {
-  Serial.println(map(analogRead(2),0,1023,-1023,1023));  
+  Serial.println(triggerButton.check());
+  // Serial.println(t);
+  // Serial.println(map(t, 0, 1023, -1023, 1023));
   delay(50);
 }
