@@ -1,3 +1,0 @@
-MapEncoder	KEYWORD1
-getValue	KEYWORD2
-setScale	KEYWORD2
