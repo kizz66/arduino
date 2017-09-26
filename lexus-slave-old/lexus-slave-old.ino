@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include <Servo.h>
 #include <SPI.h>
 #include <nRF24L01.h>
@@ -5,22 +6,12 @@
 
 Servo servo1;
 const int pinServo = 6; // пин для подключения сервопривода
-const int IN1 = 8, IN2 = 4, ENA = 3, IN3 = 7, IN4 = 5;
-
 RF24 radio(9, 10); // Создаём объект radio   для работы с библиотекой RF24, указывая номера выводов nRF24L01+ (CE, CSN)
 
-int data[3],
-    thorttle = 0;
+int data[3];
 
-int steer, trle, light;
 void setup() {
   Serial.begin (9600);
-  pinMode (ENA, OUTPUT);
-  pinMode (IN1, OUTPUT);
-  pinMode (IN2, OUTPUT);
-  pinMode (IN3, OUTPUT);
-  pinMode (IN4, OUTPUT);
-
   servo1.attach(pinServo);
   radio.begin();                                        // Инициируем работу nRF24L01+
   radio.setChannel(5);                                  // Указываем канал приёма данных (от 0 до 127), 5 - значит приём данных осуществляется на частоте 2,405 ГГц (на одном канале может быть только 1 приёмник и до 6 передатчиков)
@@ -34,25 +25,9 @@ void setup() {
 }
 
 void loop() {
-  delay(50);
+  delay(5);
   if (radio.available()) {
     radio.read(&data, sizeof(data));
-    steer = data[0];
-    trle = data[1];
-    light = data[2];
-
-    servo1.write(steer);
-    thorttle = map(trle, 0, 1023, -300, 300);
-    analogWrite(ENA, abs(constrain(thorttle - 96, -200, 200)));
-
-    Serial.println(constrain(thorttle - 110, -200, 200));
-
-    if (thorttle > 0) {
-      digitalWrite (IN1, LOW);
-      digitalWrite (IN2, HIGH);
-    } else {
-      digitalWrite (IN1, HIGH);
-      digitalWrite (IN2, LOW);
-    }
+    servo1.write(data[0]);
   }
 }
