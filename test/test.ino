@@ -1,33 +1,35 @@
+#include "DHT.h"
 #include <Wire.h>
-#include <AnalogButtonTrigger.h>
+#include <LiquidCrystal_I2C.h>
 
-const int buttonPin = 1;// button read by analog input A2
-const int IN1 = 5, IN2 = 4, ENA = 3, JOY_X = 2;
-
-int thorttle = 0;
-
-AnalogButtonTrigger triggerButton = AnalogButtonTrigger(buttonPin);
+#define DHTPIN 2
+DHT dht(DHTPIN, DHT22);
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 void setup() {
-  Serial.begin (9600);
-  pinMode (ENA, OUTPUT);
-  pinMode (IN1, OUTPUT);
-  pinMode (IN2, OUTPUT);
+  Serial.begin(9600);
+  dht.begin();
+  lcd.init();
+  lcd.backlight();
+  lcd.print("iarduino.ru");
+  lcd.setCursor(8, 1);
+  lcd.print("LCD 1602");
 }
 
 void loop() {
-  // Serial.println(triggerButton.check());
+  delay(2000);
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
-  thorttle = map(analogRead(JOY_X), 0, 1023, -255, 255);
-    if (thorttle > 0) {
-      Serial.println(thorttle);
-      analogWrite (IN1, 0);
-      digitalWrite (IN2, HIGH);
-    } else {
-      Serial.println(thorttle);
-      analogWrite (IN1, 255);
-      digitalWrite (IN2, LOW);
-    }
-  analogWrite(ENA, abs(thorttle));
-  delay(50);
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Не удается считать показания");
+    return;
+  }
+
+  Serial.print(" Влажность:%\t");
+  Serial.print(h);
+  Serial.print(" Температура:\t");
+  Serial.print(t);
+  Serial.print("C \n");
 }
+
