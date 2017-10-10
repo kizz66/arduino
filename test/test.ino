@@ -4,7 +4,7 @@
 
 #define DHTPIN 2
 DHT dht(DHTPIN, DHT22);
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
 void setup() {
   Serial.begin(9600);
