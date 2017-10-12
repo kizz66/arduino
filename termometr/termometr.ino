@@ -4,6 +4,8 @@
 
 #define DHTPIN 2
 
+//const int movPin = 4;
+
 uint8_t degres[8] = {
   B01110,
   B10001,
@@ -14,19 +16,13 @@ uint8_t degres[8] = {
   B00000
 };
 
-int trigPin = 9,
-    echoPin = 8;
-int duration, cm;
-
 DHT dht(DHTPIN, DHT22);
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
 
 void setup() {
   //Serial.begin(9600);
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
-  digitalWrite(trigPin, LOW);
 
+ // pinMode(movPin, INPUT);
   dht.begin();
   lcd.init();
   lcd.createChar(0, degres);
@@ -35,28 +31,23 @@ void setup() {
 
 void loop() {
   delay(1200);
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  duration = pulseIn(echoPin, HIGH);
-
-  cm = duration / 58; // вычисляем расстояние в сантиметрах
-
-  lcd.clear();
-  lcd.setCursor(1, 0);
-  lcd.print(cm);
 
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
   if (isnan(h) || isnan(t)) {
-    //  lcd.clear();
-    //  lcd.setCursor(1, 0);
-    //  lcd.print("Sensor error");
+    lcd.clear();
+    lcd.setCursor(1, 0);
+    lcd.print("Sensor error");
   } else {
     render(h, t);
   }
-  // lcd.noBacklight();
+
+//  if (digitalRead(movPin)) {
+//    lcd.backlight();
+//  } else {
+//    lcd.noBacklight();
+//  }
 }
 
 /**
