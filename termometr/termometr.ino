@@ -1,10 +1,11 @@
 #include "DHT.h"
+#include <Thread.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
 #define DHTPIN 2
 
-//const int movPin = 4;
+const int movPin = 4;
 
 uint8_t degres[8] = {
   B01110,
@@ -18,43 +19,57 @@ uint8_t degres[8] = {
 
 DHT dht(DHTPIN, DHT22);
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
+Thread tempThread = Thread();
+Thread moveThread = Thread();
 
 void setup() {
   //Serial.begin(9600);
-
- // pinMode(movPin, INPUT);
+  pinMode(movPin, INPUT);
   dht.begin();
   lcd.init();
   lcd.createChar(0, degres);
-  lcd.backlight();
+
+  tempThread.onRun(handleReadTemp);
+  tempThread.setInterval(10000);
+  moveThread.onRun(handleReadMove);
+  moveThread.setInterval(500);
 }
 
 void loop() {
-  delay(1200);
+  if (tempThread.shouldRun())tempThread.run();
+  if (moveThread.shouldRun())moveThread.run();
+}
+
+/**
+   Датчик движения
+*/
+void handleReadMove(void) {
+  if (digitalRead(movPin)) {
+    lcd.backlight();
+  } else {
+    lcd.noBacklight();
+  }
+}
+
+/**
+   Датчик температуры
+*/
+void handleReadTemp(void) {
 
   float h = dht.readHumidity();
   float t = dht.readTemperature();
 
   if (isnan(h) || isnan(t)) {
-    lcd.clear();
-    lcd.setCursor(1, 0);
-    lcd.print("Sensor error");
+    lcd.setCursor(15, 0);
+    lcd.print("E");
   } else {
     render(h, t);
   }
-
-//  if (digitalRead(movPin)) {
-//    lcd.backlight();
-//  } else {
-//    lcd.noBacklight();
-//  }
 }
-
 /**
 
 */
 void render(float h, float t) {
-  lcd.backlight();
   lcd.clear();
   lcd.setCursor(1, 0);
   lcd.print("Hum  ");
