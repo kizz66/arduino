@@ -33,9 +33,12 @@ void setup() {
   tempThread.setInterval(10000);
   moveThread.onRun(handleReadMove);
   moveThread.setInterval(500);
+  lcd.backlight();
+  handleReadTemp();
 }
 
 void loop() {
+  delay(50);
   if (tempThread.shouldRun())tempThread.run();
   if (moveThread.shouldRun())moveThread.run();
 }
