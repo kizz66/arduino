@@ -16,6 +16,27 @@ uint8_t degres[8] = {
   B00000,
   B00000
 };
+uint8_t arrowUp[8] = {
+  B00100,
+  B01110,
+  B11111,
+  B00100,
+  B00100,
+  B00100,
+  B00100
+};
+uint8_t arrowDown[8] = {
+  B00100,
+  B00100,
+  B00100,
+  B00100,
+  B11111,
+  B01110,
+  B00100
+};
+
+float oldHum, oldTemp;
+bool isFirstLoop = true;
 
 DHT dht(DHTPIN, DHT22);
 LiquidCrystal_I2C lcd(0x3f, 16, 2);
@@ -28,6 +49,9 @@ void setup() {
   dht.begin();
   lcd.init();
   lcd.createChar(0, degres);
+  lcd.createChar(1, arrowUp);
+  lcd.createChar(2, arrowDown);
+
 
   tempThread.onRun(handleReadTemp);
   tempThread.setInterval(10000);
@@ -66,7 +90,7 @@ void handleReadTemp(void) {
     lcd.setCursor(15, 0);
     lcd.print("E");
   } else {
-    render(h, t);
+    render(h, t - 2.5);
   }
 }
 /**
@@ -84,5 +108,27 @@ void render(float h, float t) {
   lcd.print(" ");
   lcd.write(0);
   lcd.print("C");
+
+  if (isFirstLoop) {
+    oldHum = h;
+    oldTemp = t;
+    isFirstLoop = false;
+  } else {
+    if (h < oldHum) {
+      lcd.setCursor(14, 0);
+      lcd.write(1);
+    } else if (h > oldHum) {
+      lcd.setCursor(14, 0);
+      lcd.write(2);
+    }
+
+    if (h < oldHum) {
+      lcd.setCursor(14, 1);
+      lcd.write(1);
+    } else if (h > oldHum) {
+      lcd.setCursor(14, 1);
+      lcd.write(2);
+    }
+  }
 }
 
