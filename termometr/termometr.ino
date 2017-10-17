@@ -4,6 +4,8 @@
 #include <LiquidCrystal_I2C.h>
 
 #define DHTPIN 2
+#define UP 1
+#define DOWN 2
 
 const int movPin = 4;
 
@@ -116,19 +118,20 @@ void render(float h, float t) {
   } else {
     if (h < oldHum) {
       lcd.setCursor(14, 0);
-      lcd.write(1);
+      lcd.write(DOWN);
     } else if (h > oldHum) {
       lcd.setCursor(14, 0);
-      lcd.write(2);
+      lcd.write(UP);
     }
-
-    if (h < oldHum) {
+    oldHum = h;
+    if (t < oldTemp - 0.1) {
       lcd.setCursor(14, 1);
-      lcd.write(1);
-    } else if (h > oldHum) {
+      lcd.write(DOWN);
+    } else if (t > oldTemp + 0.1) {
       lcd.setCursor(14, 1);
-      lcd.write(2);
+      lcd.write(UP);
     }
+    oldTemp = t;
   }
 }
 
