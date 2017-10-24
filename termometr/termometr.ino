@@ -124,10 +124,10 @@ void render(float h, float t) {
       lcd.write(UP);
     }
     oldHum = h;
-    if (t < oldTemp - 0.1) {
+    if (t < oldTemp) {
       lcd.setCursor(14, 1);
       lcd.write(DOWN);
-    } else if (t > oldTemp + 0.1) {
+    } else if (t > oldTemp) {
       lcd.setCursor(14, 1);
       lcd.write(UP);
     }
