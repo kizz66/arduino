@@ -1,37 +1,56 @@
 #######################################
-# Syntax ArdSim_Interface
+# Syntax ArdSim
 #######################################
+
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-ArdSimX_Interface	KEYWORD1
-ArdSimScan	KEYWORD2
+ArdSim_Interface	KEYWORD1
+ArdSimUDP	KEYWORD1
+BoardNumber	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-BoardNumber	KEYWORD1
+ArdSimStart	KEYWORD2
+ArdSimScan	KEYWORD2
+InputMatrix	KEYWORD2
+AnalogIn	KEYWORD2
+AnalogSwitch	KEYWORD2
+EncoderPin	KEYWORD2
+EncoderPort	KEYWORD2
+RepeatBtn	KEYWORD2
+ReadInput	KEYWORD2
+EncModeBtn	KEYWORD2
+servoGauge	KEYWORD2
 GetData	KEYWORD2
 NewData	KEYWORD2
-Indicator	KEYWORD2
+LEDout	KEYWORD2
+Gauge	KEYWORD2
 SimInput 	KEYWORD2
-SlaveWrite	KEYWORD2
-SlaveInit	KEYWORD2
-ProgOut	KEYWORD2		
+OutputPin	KEYWORD2
+InputPin	KEYWORD2
+StepGauge	KEYWORD2
+StepperGauges	KEYWORD2
+CountButton	KEYWORD2
 ######################################
 # Instances (KEYWORD2)
 #######################################
-SlaveNumber	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
-MAC_ADDR	LITERAL1
-ARDUINO_IP	LITERAL1
-XPLANE_IP	LITERAL1
-USB_Serial	LITERAL1
+HOLD	LITERAL1
+STATIC	LITERAL1
+LAN	LITERAL1
+USB	LITERAL1
 ON	LITERAL1
 OFF	LITERAL1
+ARDUINO_IP	LITERAL1
+XPLANE_IP	LITERAL1
+MAC_ADDR	LITERAL1
+ARDSIM_PORT	LITERAL1
+USB_SPD	LITERAL1
 
 
 
