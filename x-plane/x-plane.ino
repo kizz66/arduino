@@ -1,25 +1,17 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <ArdSimX_Interface.h>
-//#include <Servo.h>
 
 LiquidCrystal_I2C lcd(0x3f, 16, 2); // i2c address 0x27
 
-//Servo flapsPositionGauge;
-
 void setup()  {
-
-  //flapsPositionGauge.attach(10);
-  //servo.write(0);
-  //delay(500);
-  //servo.write(0);
-
   BoardNumber 1;// -- Assign Board Number here  (0...9)
   lcd.init();
   lcd.backlight();
-  lcd.clear();
   lcd.setCursor(0, 0);
-  lcd.print("System ready");
+  lcd.print("ready");
+  delay(2000);
+  lcd.clear();
 }
 
 void loop()   {
@@ -39,12 +31,9 @@ void ProgOut(byte id, float val) {
     case 6: lcd.setCursor(9, 0);  if (val == 2) lcd.print("ALT");  else lcd.print("   ");  break;
     case 7: lcd.setCursor(9, 0);  if (val == 2) lcd.print("V/S");  else lcd.print("   ");  break;
     case 8: lcd.setCursor(10, 1); if (val == 1) lcd.print("YAW");  else lcd.print("   ");  break;
-    case 9:
-      lcd.clear();
-      lcd.setCursor(16, 1);
-      if (val == 1) lcd.print("L");  else lcd.print(" ");           
-      }
+  }
 }
+
 /*  Lines in the "data.cfg"  file:
   570
   1D 0 sim/cockpit2/autopilot/flight_director_mode
