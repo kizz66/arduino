@@ -61,11 +61,23 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 
 ---- Digital pins: ----
 
+7 - Gear is Down (Green light for each gear)
+8 - Gear is Unsafe ( red lamps for each gear)
+9 - Autopilot Vertical Speed set, encoder
+13 - Autopilot Altitude pre-set, encoder
 
 ---- Analog pins: ----
 
-2 - Vertical speed, at pre-selected VSI.
-3 - Altitude-hold ARM (pre-selected ALT)
+0 - Taxi lights Switch
+1 - Landing gear down (end-switch) / Landing gear up ( end-switch)
+2 - Flaps Down ( - notch) position
+3 - Flaps Up ( + notch) position
+6 - Mixture control, all
+7 - Altitude-hold ARM (pre-selected ALT)
+
+---- Matrix: ----
+
+1 - Altitude-hold ARM (pre-selected ALT)
 
 ---- Programmable inputs: ----
 
@@ -79,7 +91,7 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 5 - Nav mode status
 6 - Altitude hold status
 7 - Vvi mode status
-8 - Combined Alt/VVI selector display shows VVI or ALT
+8 - Altitude to hold dialed into the AP
 
 
 
@@ -87,9 +99,22 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 
 *1-4Ui
 [A]
+R A7+
+B 2 4 5 6 11
 [I]
-A2+ sim/autopilot/vertical_speed_pre_sel
-A3+ sim/autopilot/altitude_arm
+e13- sim/autopilot/altitude_down
+e13+ sim/autopilot/altitude_up
+e9- sim/autopilot/vertical_speed_down
+e9+ sim/autopilot/vertical_speed_up
+A3+ sim/flight_controls/flaps_up
+A2+ sim/flight_controls/flaps_down
+A1- sim/flight_controls/landing_gear_down
+A1+ sim/flight_controls/landing_gear_up
+A6 sim/cockpit2/engine/actuators/mixture_ratio_all 0,1 1 3 0 100
+A7+ sim/autopilot/altitude_arm
+A0- sim/lights/taxi_lights_off
+A0+ sim/lights/taxi_lights_on
+B1+ sim/autopilot/altitude_arm
 [O]
 1D 0 sim/cockpit2/autopilot/flight_director_mode
 2D 0 sim/cockpit2/autopilot/heading_status
@@ -99,5 +124,7 @@ A3+ sim/autopilot/altitude_arm
 6D 0 sim/cockpit2/autopilot/altitude_hold_status
 7D 0 sim/cockpit2/autopilot/vvi_status
 10S 2 sim/cockpit2/controls/flap_handle_deploy_ratio 1 0,1 1000,1800
-8D 0 sim/cockpit2/autopilot/alt_vvi_is_showing_vvi 1
+8D -1 sim/cockpit2/autopilot/altitude_dial_ft 1
+7L 1 sim/flightmodel2/gear/deploy_ratio 1
+8L 0 sim/flightmodel2/gear/deploy_ratio 1 0.01 0.99
 */
