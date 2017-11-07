@@ -4,7 +4,7 @@
 
 LiquidCrystal_I2C lcd(0x3f, 16, 2); // i2c address 0x27
 
-int outValues[8]; // 0-6 autopilot status 7- VS
+int outValues[9]; // 0-6 autopilot status 7- Autopilot ALT 8 - VVI
 
 void setup()  {
   BoardNumber 1;// -- Assign Board Number here  (0...9)
@@ -27,16 +27,26 @@ void ProgOut(byte id, float val) {
     outValues[id - 1] = val;
     renderApStatus();
   }
-   // ALT / VS
+   // ALT
   if (id == 8 ) {
     outValues[id - 1] = val;
-    renderAltAndVs();
+    renderAlt();
+  }
+    // VVI
+  if (id == 9 ) {
+    outValues[id - 1] = val;
+    renderVs();
   }
 }
 
-void renderAltAndVs(void) {
+void renderAlt(void) {
   lcd.clear();
   lcd.setCursor(0, 0); lcd.print(outValues[7]);
+}
+
+void renderVs(void) {
+  lcd.clear();
+  lcd.setCursor(0, 0); lcd.print(outValues[8]);
 }
 
 void renderApStatus(void) {
@@ -68,19 +78,14 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 
 ---- Analog pins: ----
 
-0 - Taxi lights Switch
+0 - Mixture control, all
 1 - Landing gear down (end-switch) / Landing gear up ( end-switch)
 2 - Flaps Down ( - notch) position
 3 - Flaps Up ( + notch) position
-6 - Mixture control, all
-7 - Altitude-hold ARM (pre-selected ALT)
 
 ---- Matrix: ----
 
 1 - Altitude-hold ARM (pre-selected ALT)
-
----- Programmable inputs: ----
-
 
 ---- Programmable outputs: ----
 
@@ -92,6 +97,7 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 6 - Altitude hold status
 7 - Vvi mode status
 8 - Altitude to hold dialed into the AP
+9 - VVI commanded display
 
 
 
@@ -99,7 +105,6 @@ Board #1 - Arduino (USB) + i2c -------------------------------------------------
 
 *1-4Ui
 [A]
-R A7+
 B 2 4 5 6 11
 [I]
 e13- sim/autopilot/altitude_down
@@ -110,10 +115,7 @@ A3+ sim/flight_controls/flaps_up
 A2+ sim/flight_controls/flaps_down
 A1- sim/flight_controls/landing_gear_down
 A1+ sim/flight_controls/landing_gear_up
-A6 sim/cockpit2/engine/actuators/mixture_ratio_all 0,1 1 3 0 100
-A7+ sim/autopilot/altitude_arm
-A0- sim/lights/taxi_lights_off
-A0+ sim/lights/taxi_lights_on
+A0 sim/cockpit2/engine/actuators/mixture_ratio_all 0,1 1 100 0 100
 B1+ sim/autopilot/altitude_arm
 [O]
 1D 0 sim/cockpit2/autopilot/flight_director_mode
@@ -127,4 +129,5 @@ B1+ sim/autopilot/altitude_arm
 8D -1 sim/cockpit2/autopilot/altitude_dial_ft 1
 7L 1 sim/flightmodel2/gear/deploy_ratio 1
 8L 0 sim/flightmodel2/gear/deploy_ratio 1 0.01 0.99
+9D -1 sim/cockpit2/autopilot/vvi_dial_fpm 1
 */
