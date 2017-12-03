@@ -12,6 +12,9 @@ YELLOW_KEY  = "20dfc639",
 BLUE_KEY    = "20df8679",
 REPEAT_KEY  = "ffffffff";
 
+int const
+ANALOG_OUT_PIN = 10;
+
 String key = "";
 
 int
@@ -19,8 +22,9 @@ value = 0,
 ratio = 10;
 
 void setup() {
-  Serial.begin(9600); // выставляем скорость COM порта
+  //Serial.begin(9600); // выставляем скорость COM порта
   irrecv.enableIRIn(); // запускаем прием
+  pinMode(ANALOG_OUT_PIN, OUTPUT);
 }
 
 void loop() {
@@ -32,9 +36,9 @@ void loop() {
       key = result;
     }
     if (key == RED_KEY) {
-   
+
     } else if (key == GREEN_KEY) {
-    
+
     } else  if (key == YELLOW_KEY) {
       value += ratio;
       value = value <= 255 ? value : 255;
@@ -43,6 +47,7 @@ void loop() {
       value = value >= 0 ? value : 0;
     }
     irrecv.resume(); // принимаем следующую команду
-    Serial.println(value);
+    analogWrite(ANALOG_OUT_PIN, value);
+    // Serial.println(value);
   }
 }
