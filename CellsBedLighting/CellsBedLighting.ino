@@ -1,4 +1,5 @@
 #include "IRremote.h"
+#include <EEPROM.h>
 
 IRrecv irrecv(11); // указываем вывод, к которому подключен приемник
 decode_results results;
@@ -9,11 +10,19 @@ OUT_PIN = 3;
 int trigger = false;
 
 void setup() {
+  bool state = EEPROM.read(0);
+
   irrecv.enableIRIn(); // запускаем прием
   pinMode(OUT_PIN, OUTPUT);
   pinMode(13, OUTPUT);
 
-  digitalWrite(OUT_PIN, LOW);// управляем длоком реле (низкий уровень) 
+  if ( state == 255 ) {
+    digitalWrite(OUT_PIN, LOW);// управляем длоком реле (низкий уровень)
+    trigger = true;
+  } else {
+    trigger = false;
+    digitalWrite(OUT_PIN, HIGH);
+  }
 }
 void loop() {
   if ( irrecv.decode( &results )) { // если данные пришли
@@ -40,6 +49,7 @@ void turnOn() {
   trigger = true;
   digitalWrite(OUT_PIN, LOW);
   digitalWrite(13, HIGH);
+  EEPROM.write(0, 255);
 }
 
 void turnOff() {
@@ -47,4 +57,5 @@ void turnOff() {
   trigger = false;
   digitalWrite(OUT_PIN, HIGH);
   digitalWrite(13, LOW);
+  EEPROM.write(0, 0);
 }
