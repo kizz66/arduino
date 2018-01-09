@@ -6,7 +6,7 @@ decode_results results;
 //Заточена под пульт телевизора LG
 int const
 OUT_PIN = 9;
-bool state = false;
+bool state = true;
 void setup() {
   irrecv.enableIRIn(); // запускаем прием
   pinMode(OUT_PIN, OUTPUT);
