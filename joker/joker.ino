@@ -3,7 +3,7 @@ const int UP = 0,
 
 int led = 1, // 3 - UNO
     val,
-    valueTriggedLevel = 5 50,
+    valueTriggedLevel = 550,
     outValue = 0,
     lightDuration = 5,
     direct = UP;
@@ -17,7 +17,7 @@ void setup() {
 }
 
 void loop() {
-  val = analogRead(2); // A0 - UNO
+  val = analogRead(A1); // A0 - UNO
   if (val > valueTriggedLevel) {
     if ( flashTrigger ) {
       isFlash = true;
