@@ -4,7 +4,8 @@ const int UP = 0,
 int led = 1,// 3 - UNO
     motor = 0,
     val,
-    valueTriggedLevel = 650,
+    valueTriggedLevel = 700,
+    gisteresisLevel = 600,
     outValue = 0,
     lightDuration = 5,
     direct = UP;
@@ -25,12 +26,12 @@ void loop() {
       isFlash = true;
       flashTrigger = false;
     }
-  } else {
+  } else if (val <  gisteresisLevel) {
     flashTrigger = true;
   }
 
   doFlash();
-  delay(30);
+  delay(10);
 }
 
 void doFlash(void) {
