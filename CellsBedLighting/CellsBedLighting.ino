@@ -1,11 +1,11 @@
 #include "IRremote.h"
 
-IRrecv irrecv(11); // указываем вывод, к которому подключен приемник
+IRrecv irrecv(A2); // указываем вывод, к которому подключен приемник
 decode_results results;
 
 //Заточена под пульт телевизора LG
 int const
-OUT_PIN = 9;
+OUT_PIN = 1;
 bool state = true;
 void setup() {
   irrecv.enableIRIn(); // запускаем прием
