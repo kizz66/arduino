@@ -7,33 +7,29 @@
 */
 
 #include <tiny_IRremote.h>
-
+#include <TinyWireS.h>
 const int
-RECV_PIN = 0,
-LED_PIN = 1;
+RECV_PIN = 3,
+LED_PIN = 4;
 
-int button = 0x1FD3B9BF; // синяя кнопка
+int code;
 
 IRrecv irrecv(RECV_PIN);
-
 decode_results results;
 
 void setup()
 {
   pinMode(LED_PIN, OUTPUT);
-  digitalWrite(LED_PIN, HIGH);
-  delay(1000);
-  digitalWrite(LED_PIN, LOW);
-
   irrecv.enableIRIn();
 }
 
 void loop() {
-  if (irrecv.decode(&results) && results.value == 0x1fd3b9bf) {
-    digitalWrite(LED_PIN, HIGH);
+  if (irrecv.decode(&results)) {
+    if (results.value == 0x20DF8877 ) {
+      digitalWrite(LED_PIN, LOW);
+    } else {
+      digitalWrite(LED_PIN, HIGH);
+    }
     irrecv.resume(); // Receive the next value
-  } else {
-    digitalWrite(LED_PIN, LOW);
   }
-  delay(50);
 }
