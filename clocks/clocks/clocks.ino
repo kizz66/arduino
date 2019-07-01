@@ -1,15 +1,23 @@
 /*
 */
+#define PERIOD_1 500
 
 #define DEC_HOURS 8
-#define HOURS 7 //ок
-#define DEC_MIN 9 // ok
+#define HOURS 7
+#define DEC_MIN 9
 #define MIN 6
 
 #define D1 10
-#define D2 12 // ok
-#define D3 11 // ок
-#define D4 13 // ok
+#define D2 12
+#define D3 11
+#define D4 13
+
+#define SEC_PIN 2
+
+
+
+unsigned long timer_1, timer_2, timer_3;
+bool secondsFlash;
 
 // десятки часов, часы, десятки минут, минуты
 int displayData[4] = {1, 2, 3, 4};
@@ -36,7 +44,7 @@ void setValueToDigit(int value, int digitNumber) {
   digitalWrite(D3, chars[value][1]);
   digitalWrite(D4, chars[value][0]);
   digitalWrite(digitNumber, HIGH);
-  delay(3);
+  delay(2);
 }
 
 void digitsOff(void) {
@@ -56,9 +64,20 @@ void setup() {
   pinMode(D2, OUTPUT);
   pinMode(D3, OUTPUT);
   pinMode(D4, OUTPUT);
+
+  pinMode(SEC_PIN, OUTPUT);
+  secondsFlash = LOW;
 }
 
 void loop() {
+  if (millis() - timer_1 > PERIOD_1) {
+    timer_1 = millis();
+
+    secondsFlash = secondsFlash ? LOW : HIGH;
+    digitalWrite(SEC_PIN, secondsFlash);
+
+  }
+
   setValueToDigit(displayData[0], displayDigit[0]);
   setValueToDigit(displayData[1], displayDigit[1]);
   setValueToDigit(displayData[2], displayDigit[2]);
