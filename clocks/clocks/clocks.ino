@@ -53,11 +53,6 @@ void setup() {
 
   pinMode(SEC_PIN, OUTPUT);
   secondsFlash = LOW;
-
-  if (! RTC.isrunning()) {
-    // строка ниже используется для настройки даты и времени часов
-    // RTC.adjust(DateTime(__DATE__, __TIME__));
-  }
 }
 
 void loop() {

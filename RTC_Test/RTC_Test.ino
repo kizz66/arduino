@@ -20,7 +20,7 @@ Serial.println("RTC is NOT running!");
 
 // строка ниже используется для настройки даты и времени часов
 
- RTC.adjust(DateTime(__DATE__, __TIME__));
+ //RTC.adjust(DateTime(__DATE__, __TIME__));
 
 }
 
