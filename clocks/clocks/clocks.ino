@@ -1,6 +1,9 @@
-/*
-*/
+#include "RTClib.h"
+
+RTC_DS1307 RTC;
+
 #define PERIOD_1 500
+#define PERIOD_2 1000
 
 #define DEC_HOURS 8
 #define HOURS 7
@@ -20,7 +23,7 @@ unsigned long timer_1, timer_2, timer_3;
 bool secondsFlash;
 
 // десятки часов, часы, десятки минут, минуты
-int displayData[4] = {1, 2, 3, 4};
+int8_t displayData[4] = {1, 2, 3, 4};
 int displayDigit[4] = {DEC_HOURS, HOURS, DEC_MIN, MIN};
 
 int chars[10][4] = {
@@ -36,25 +39,8 @@ int chars[10][4] = {
   {HIGH, LOW, LOW, HIGH},
 };
 
-void setValueToDigit(int value, int digitNumber) {
-  digitsOff();
-  delay(2);
-  digitalWrite(D1, chars[value][3]);
-  digitalWrite(D2, chars[value][2]);
-  digitalWrite(D3, chars[value][1]);
-  digitalWrite(D4, chars[value][0]);
-  digitalWrite(digitNumber, HIGH);
-  delay(2);
-}
-
-void digitsOff(void) {
-  digitalWrite(DEC_HOURS, LOW);
-  digitalWrite(HOURS, LOW);
-  digitalWrite(DEC_MIN, LOW);
-  digitalWrite(MIN, LOW);
-}
-
 void setup() {
+  RTC.begin();
   pinMode(DEC_HOURS, OUTPUT);
   pinMode(HOURS, OUTPUT);
   pinMode(DEC_MIN, OUTPUT);
@@ -67,19 +53,63 @@ void setup() {
 
   pinMode(SEC_PIN, OUTPUT);
   secondsFlash = LOW;
+
+  if (! RTC.isrunning()) {
+    // строка ниже используется для настройки даты и времени часов
+    // RTC.adjust(DateTime(__DATE__, __TIME__));
+  }
 }
 
 void loop() {
+  /**
+     500 ms block
+     Seconds flash
+  */
   if (millis() - timer_1 > PERIOD_1) {
     timer_1 = millis();
 
     secondsFlash = secondsFlash ? LOW : HIGH;
     digitalWrite(SEC_PIN, secondsFlash);
+  }
 
+  /**
+     1000 ms block
+     Read clock
+  */
+  if (millis() - timer_2 > PERIOD_2) {
+    timer_2 = millis();
+
+    DateTime now = RTC.now();
+    displayData[0] = now.hour() / 10;
+    displayData[1] = now.hour() % 10;
+    displayData[2] = now.minute() / 10;
+    displayData[3] = now.minute() % 10;
   }
 
   setValueToDigit(displayData[0], displayDigit[0]);
   setValueToDigit(displayData[1], displayDigit[1]);
   setValueToDigit(displayData[2], displayDigit[2]);
   setValueToDigit(displayData[3], displayDigit[3]);
+}
+/**
+
+*/
+void setValueToDigit(int value, int digitNumber) {
+  digitsOff();
+  delay(2);
+  digitalWrite(D1, chars[value][3]);
+  digitalWrite(D2, chars[value][2]);
+  digitalWrite(D3, chars[value][1]);
+  digitalWrite(D4, chars[value][0]);
+  digitalWrite(digitNumber, HIGH);
+  delay(2);
+}
+/**
+
+*/
+void digitsOff(void) {
+  digitalWrite(DEC_HOURS, LOW);
+  digitalWrite(HOURS, LOW);
+  digitalWrite(DEC_MIN, LOW);
+  digitalWrite(MIN, LOW);
 }
