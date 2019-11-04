@@ -176,6 +176,7 @@ void readIr(void) {
         setTime = setTime ? false : true;
         break;
     }
+    
     irrecv.resume(); // Receive the next value
   }
 }
