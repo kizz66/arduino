@@ -3,9 +3,10 @@
 
 RTC_DS1307 RTC;
 
-#define PERIOD_1 500
-#define PERIOD_2 1000
+#define PERIOD_1 500 /* for seconds flashing */
+#define PERIOD_2 1000 /* for clock reading */
 #define PERIOD_3 50 /* for ir reading */
+#define PERIOD_4 300 /* for digit blinking */
 
 #define DEC_HOURS 8
 #define HOURS 7
@@ -23,31 +24,16 @@ RTC_DS1307 RTC;
 IRrecv irrecv(IR_INPUT_PIN);
 decode_results results;
 
-#define KEY_OK D7E84B1B
-#define KEY_UP 0x55555555
-#define KEY_DOWN 0x55555555
-#define KEY_RIGHT 0x55555555
-#define KEY_LEFT 0x55555555
-#define KEY_1 0x55555555
-#define KEY_2 0x55555555
-#define KEY_3 0x55555555
-#define KEY_4 0x55555555
-#define KEY_5 0x55555555
-#define KEY_6 0x55555555
-#define KEY_7 0x55555555
-#define KEY_8 0x55555555
-#define KEY_9 0x55555555
-#define KEY_0 0x55555555
-#define KEY_STAR 0x55555555
-#define KEY_GRILL 0x55555555
-
-unsigned long timer_1, timer_2, timer_3;
+unsigned long timer_1, timer_2, timer_3, timer_4;
 bool secondsFlash;
 bool setTime = false;
+bool digitBlink = false;
 
 // десятки часов, часы, десятки минут, минуты
 int8_t displayData[4] = {1, 2, 3, 4};
 int displayDigit[4] = {DEC_HOURS, HOURS, DEC_MIN, MIN};
+
+int currentDigitToSetup = 0; // 0-3
 
 int chars[10][4] = {
   {LOW, LOW, LOW, LOW},
@@ -84,7 +70,6 @@ void setup() {
 
 void loop() {
   /**
-     500 ms block
      Seconds flash
   */
   if (millis() - timer_1 > PERIOD_1) {
@@ -98,44 +83,61 @@ void loop() {
   }
 
   /**
-     1000 ms block
      Read clock
   */
   if (millis() - timer_2 > PERIOD_2) {
     timer_2 = millis();
 
-    DateTime now = RTC.now();
-    displayData[0] = now.hour() / 10;
-    displayData[1] = now.hour() % 10;
-    displayData[2] = now.minute() / 10;
-    displayData[3] = now.minute() % 10;
+    if (!setTime) {
+      DateTime now = RTC.now();
+      displayData[0] = now.hour() / 10;
+      displayData[1] = now.hour() % 10;
+      displayData[2] = now.minute() / 10;
+      displayData[3] = now.minute() % 10;
+    }
   }
 
   /**
-     500 ms block
      Read IR
   */
   if (millis() - timer_3 > PERIOD_3) {
     timer_3 = millis();
     readIr();
   }
+  /**
+    digit blinking
+  */
+  if (millis() - timer_4 > PERIOD_4) {
+    timer_4 = millis();
+    digitBlink = digitBlink ? false : true;
+  }
 
-  setValueToDigit(displayData[0], displayDigit[0]);
-  setValueToDigit(displayData[1], displayDigit[1]);
-  setValueToDigit(displayData[2], displayDigit[2]);
-  setValueToDigit(displayData[3], displayDigit[3]);
+  if (!setTime) {
+    setValueToDigit(displayData[0], displayDigit[0], true);
+    setValueToDigit(displayData[1], displayDigit[1], true);
+    setValueToDigit(displayData[2], displayDigit[2], true);
+    setValueToDigit(displayData[3], displayDigit[3], true);
+  } else {
+    // установка времени мигание текущего разряда
+    setValueToDigit(displayData[0], displayDigit[0], currentDigitToSetup == 0 ? digitBlink : true);
+    setValueToDigit(displayData[1], displayDigit[1], currentDigitToSetup == 1 ? digitBlink : true);
+    setValueToDigit(displayData[2], displayDigit[2], currentDigitToSetup == 2 ? digitBlink : true);
+    setValueToDigit(displayData[3], displayDigit[3], currentDigitToSetup == 3 ? digitBlink : true);
+  }
 }
 /**
 
 */
-void setValueToDigit(int value, int digitNumber) {
+void setValueToDigit(int value, int digitNumber, bool blink) {
   digitsOff();
   delay(2);
   digitalWrite(D1, chars[value][3]);
   digitalWrite(D2, chars[value][2]);
   digitalWrite(D3, chars[value][1]);
   digitalWrite(D4, chars[value][0]);
-  digitalWrite(digitNumber, HIGH);
+  if (blink) {
+    digitalWrite(digitNumber, HIGH);
+  }
   delay(2);
 }
 /**
@@ -147,6 +149,54 @@ void digitsOff(void) {
   digitalWrite(DEC_MIN, LOW);
   digitalWrite(MIN, LOW);
 }
+/*
+  Turn time setup mode to ON
+*/
+void setTimeOn(void) {
+  setTime = true;
+  digitsOff();
+}
+/*
+  Turn time setup mode to OFF
+*/
+void setTimeOff(void) {
+  setTime = false;
+}
+/*
+
+*/
+int getDigitLimit(void) {
+  switch (currentDigitToSetup) {
+    case 0:
+      return 2;
+    case 1:
+      return 4;
+    case 2:
+      return 5;
+    case 3:
+      return 9;
+  }
+}
+/*
+
+*/
+void digitIncrease(void) {
+  int value = displayData[currentDigitToSetup];
+  int limit = getDigitLimit();
+  value++;
+  value = value > limit ? 0 : value;
+  displayData[currentDigitToSetup] = value;
+}
+/*
+
+*/
+void digitDecrease(void) {
+  int value = displayData[currentDigitToSetup];
+  int limit = getDigitLimit();
+  value--;
+  value = value < 0 ? limit : value;
+  displayData[currentDigitToSetup] = value;
+}
 /**
   reading IR
 */
@@ -155,28 +205,28 @@ void readIr(void) {
 
     switch (results.value) {
       case 0xD7E84B1B://OK
-        setTime = setTime ? false : true;
+        if (setTime) {
+          setTimeOff();
+        } else {
+          setTimeOn();
+        }
         break;
       case 0x511DBB://UP
-        setTime = setTime ? false : true;
+        digitIncrease();
         break;
       case 0xA3C8EDDB://DOWN
-        setTime = setTime ? false : true;
+        digitDecrease();
         break;
       case 0x20FE4DBB://RIGHT
-        setTime = setTime ? false : true;
+        currentDigitToSetup++;
+        currentDigitToSetup = currentDigitToSetup > 3 ? 0 : currentDigitToSetup;
         break;
       case 0x52A3D41F://LEFT
-        setTime = setTime ? false : true;
-        break;
-      case 0xC101E57B://1
-        setTime = setTime ? false : true;
-        break;
-      case 0x97483BFB://2
-        setTime = setTime ? false : true;
+        currentDigitToSetup--;
+        currentDigitToSetup = currentDigitToSetup < 0 ? 3 : currentDigitToSetup;
         break;
     }
-    
+
     irrecv.resume(); // Receive the next value
   }
 }
