@@ -5,6 +5,7 @@ RTC_DS1307 RTC;
 
 #define PERIOD_1 500
 #define PERIOD_2 1000
+#define PERIOD_3 50 /* for ir reading */
 
 #define DEC_HOURS 8
 #define HOURS 7
@@ -23,25 +24,26 @@ IRrecv irrecv(IR_INPUT_PIN);
 decode_results results;
 
 #define KEY_OK D7E84B1B
-#define KEY_UP
-#define KEY_DOWN
-#define KEY_RIGHT
-#define KEY_LEFT
-#define KEY_1
-#define KEY_2
-#define KEY_3
-#define KEY_4
-#define KEY_5
-#define KEY_6
-#define KEY_7
-#define KEY_8
-#define KEY_9
-#define KEY_0
-#define KEY_STAR
-#define KEY_GRILL
+#define KEY_UP 0x55555555
+#define KEY_DOWN 0x55555555
+#define KEY_RIGHT 0x55555555
+#define KEY_LEFT 0x55555555
+#define KEY_1 0x55555555
+#define KEY_2 0x55555555
+#define KEY_3 0x55555555
+#define KEY_4 0x55555555
+#define KEY_5 0x55555555
+#define KEY_6 0x55555555
+#define KEY_7 0x55555555
+#define KEY_8 0x55555555
+#define KEY_9 0x55555555
+#define KEY_0 0x55555555
+#define KEY_STAR 0x55555555
+#define KEY_GRILL 0x55555555
 
 unsigned long timer_1, timer_2, timer_3;
 bool secondsFlash;
+bool setTime = false;
 
 // десятки часов, часы, десятки минут, минуты
 int8_t displayData[4] = {1, 2, 3, 4};
@@ -74,7 +76,7 @@ void setup() {
 
   pinMode(SEC_PIN, OUTPUT);
   pinMode(IR_INPUT_PIN, INPUT);
-  
+
   secondsFlash = LOW;
 
   irrecv.enableIRIn(); // Start the receiver
@@ -87,8 +89,11 @@ void loop() {
   */
   if (millis() - timer_1 > PERIOD_1) {
     timer_1 = millis();
-
-    secondsFlash = secondsFlash ? LOW : HIGH;
+    if (setTime) {
+      secondsFlash = HIGH;
+    } else {
+      secondsFlash = secondsFlash ? LOW : HIGH;
+    }
     digitalWrite(SEC_PIN, secondsFlash);
   }
 
@@ -104,6 +109,15 @@ void loop() {
     displayData[1] = now.hour() % 10;
     displayData[2] = now.minute() / 10;
     displayData[3] = now.minute() % 10;
+  }
+
+  /**
+     500 ms block
+     Read IR
+  */
+  if (millis() - timer_3 > PERIOD_3) {
+    timer_3 = millis();
+    readIr();
   }
 
   setValueToDigit(displayData[0], displayDigit[0]);
@@ -132,4 +146,36 @@ void digitsOff(void) {
   digitalWrite(HOURS, LOW);
   digitalWrite(DEC_MIN, LOW);
   digitalWrite(MIN, LOW);
+}
+/**
+  reading IR
+*/
+void readIr(void) {
+  if ( irrecv.decode( &results )) {
+
+    switch (results.value) {
+      case 0xD7E84B1B://OK
+        setTime = setTime ? false : true;
+        break;
+      case 0x511DBB://UP
+        setTime = setTime ? false : true;
+        break;
+      case 0xA3C8EDDB://DOWN
+        setTime = setTime ? false : true;
+        break;
+      case 0x20FE4DBB://RIGHT
+        setTime = setTime ? false : true;
+        break;
+      case 0x52A3D41F://LEFT
+        setTime = setTime ? false : true;
+        break;
+      case 0xC101E57B://1
+        setTime = setTime ? false : true;
+        break;
+      case 0x97483BFB://2
+        setTime = setTime ? false : true;
+        break;
+    }
+    irrecv.resume(); // Receive the next value
+  }
 }
