@@ -160,6 +160,8 @@ void setTimeOn(void) {
   Turn time setup mode to OFF
 */
 void setTimeOff(void) {
+
+  RTC.adjust(DateTime(2019, 1, 1, displayData[0] * 10 + displayData[1], displayData[2] * 10 + displayData[3], 0));
   setTime = false;
 }
 /*
