@@ -1,4 +1,5 @@
 #include "RTClib.h"
+#include <IRremote.h>
 
 RTC_DS1307 RTC;
 
@@ -17,7 +18,27 @@ RTC_DS1307 RTC;
 
 #define SEC_PIN 2
 
+#define IR_INPUT_PIN 3
+IRrecv irrecv(IR_INPUT_PIN);
+decode_results results;
 
+#define KEY_OK D7E84B1B
+#define KEY_UP
+#define KEY_DOWN
+#define KEY_RIGHT
+#define KEY_LEFT
+#define KEY_1
+#define KEY_2
+#define KEY_3
+#define KEY_4
+#define KEY_5
+#define KEY_6
+#define KEY_7
+#define KEY_8
+#define KEY_9
+#define KEY_0
+#define KEY_STAR
+#define KEY_GRILL
 
 unsigned long timer_1, timer_2, timer_3;
 bool secondsFlash;
@@ -52,7 +73,11 @@ void setup() {
   pinMode(D4, OUTPUT);
 
   pinMode(SEC_PIN, OUTPUT);
+  pinMode(IR_INPUT_PIN, INPUT);
+  
   secondsFlash = LOW;
+
+  irrecv.enableIRIn(); // Start the receiver
 }
 
 void loop() {
