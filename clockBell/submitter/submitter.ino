@@ -5,6 +5,7 @@
 #define SUBMITTER_PIN 4
 #define CONTROL_PIN 1
 
+#define DELAY 10
 int oldControlValue = LOW;
 
 void setup() {
@@ -20,7 +21,7 @@ void loop() {
   if (checkInputControl(digitalRead(CONTROL_PIN))) {
     submit();
   }
-  delay(200);
+  delay(50);
 }
 
 /**
@@ -43,16 +44,16 @@ bool checkInputControl(int value) {
 void submit() {
   digitalWrite(LED_PIN, HIGH);
   digitalWrite(SUBMITTER_PIN, HIGH);
-  delay(100);
+  delay(DELAY * 2);
   digitalWrite(SUBMITTER_PIN, LOW);
-  delay(50);
+  delay(DELAY);
   digitalWrite(SUBMITTER_PIN, HIGH);
-  delay(50);
+  delay(DELAY);
   digitalWrite(SUBMITTER_PIN, LOW);
-  delay(50);
+  delay(DELAY);
   digitalWrite(SUBMITTER_PIN, HIGH);
-  delay(100);
+  delay(DELAY * 2);
   digitalWrite(SUBMITTER_PIN, LOW);
-  delay(50);
+  delay(DELAY);
   digitalWrite(LED_PIN, LOW);
 }
