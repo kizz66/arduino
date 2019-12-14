@@ -1,5 +1,6 @@
-const int prm = 3; // пин входа приёмника XY-MK-5V
-const int ledPin = 2; // пин встроенного светодиода Arduino
+#define RPM 3//A0//3 // пин входа приёмника XY-MK-5V
+#define LED_PIN 2//13//2 // пин встроенного светодиода Arduino
+
 const int len = 14; // длина массивов
 
 bool state = false; // текущее состояние светодиода
@@ -7,17 +8,21 @@ int pattern[len] = {1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0}; // эталонн
 int testReg[len] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // тестовый регистр - массив оцифрованных значений с входа приёмника
 
 void setup() {
-  pinMode(ledPin, OUTPUT);
-  pinMode(ledPin, INPUT);
-  digitalWrite(ledPin, LOW);
+//  Serial.begin(9600);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(RPM, INPUT);
+  digitalWrite(LED_PIN, LOW);
 }
 
 void loop() {
-  int data = digitalRead(prm); // читаем значение на входе приёмника
+  int data = digitalRead(RPM); // читаем значение на входе приёмника
   ShiftReg(data, testReg); // вдвигаем полученное число в тестовый регистр
-  if (IsCommandDetected) { // проверяем, нет ли в тестовом регистре искомой последовательности
+ // Serial.println(data);
+  bool test = IsCommandDetected();
+  // Serial.println(test);
+  if (test) { // проверяем, нет ли в тестовом регистре искомой последовательности
     state = !state; // если есть, меняем состояние светодиода
-    digitalWrite(ledPin, state);
+    digitalWrite(LED_PIN, state);
   }
   delay(50);
 }

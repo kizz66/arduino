@@ -5,7 +5,7 @@
 #define SUBMITTER_PIN 4
 #define CONTROL_PIN 1
 
-#define DELAY 10
+#define DELAY 50
 int oldControlValue = LOW;
 
 void setup() {
