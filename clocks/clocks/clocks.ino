@@ -18,6 +18,8 @@ RTC_DS1307 RTC;
 #define D3 11
 #define D4 13
 
+#define HOUR_BELL 5
+
 #define SEC_PIN 2
 
 #define IR_INPUT_PIN 3
@@ -32,6 +34,8 @@ bool digitBlink = false;
 // десятки часов, часы, десятки минут, минуты
 int8_t displayData[4] = {1, 2, 3, 4};
 int displayDigit[4] = {DEC_HOURS, HOURS, DEC_MIN, MIN};
+
+int8_t oldHour;
 
 int currentDigitToSetup = 0; // 0-3
 
@@ -63,9 +67,18 @@ void setup() {
   pinMode(SEC_PIN, OUTPUT);
   pinMode(IR_INPUT_PIN, INPUT);
 
+  pinMode(HOUR_BELL, OUTPUT);
+
   secondsFlash = LOW;
 
   irrecv.enableIRIn(); // Start the receiver
+
+  // testing bell transmitter
+  digitalWrite(HOUR_BELL, LOW);
+  delay(500);
+  digitalWrite(HOUR_BELL, HIGH);
+  delay(500);
+  digitalWrite(HOUR_BELL, LOW);
 }
 
 void loop() {
@@ -94,6 +107,14 @@ void loop() {
       displayData[1] = now.hour() % 10;
       displayData[2] = now.minute() / 10;
       displayData[3] = now.minute() % 10;
+
+      // check hour for transmit
+      if ( oldHour != displayData[1]) {
+        oldHour = displayData[1];
+        digitalWrite(HOUR_BELL, HIGH);
+      } else {
+        digitalWrite(HOUR_BELL, LOW);
+      }
     }
   }
 
