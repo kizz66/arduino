@@ -193,6 +193,11 @@ int getDigitLimit(void) {
     case 0:
       return 2;
     case 1:
+      if (displayData[0] == 2) {
+        return 4;
+      } else {
+        return 9;
+      }
       return 4;
     case 2:
       return 5;
@@ -209,6 +214,9 @@ void digitIncrease(void) {
   value++;
   value = value > limit ? 0 : value;
   displayData[currentDigitToSetup] = value;
+  if (currentDigitToSetup == 0 && value == 2 && displayData[1] > 4 ) {
+    displayData[1] = 4;
+  }
 }
 /*
 
