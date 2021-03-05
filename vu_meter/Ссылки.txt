@@ -1,0 +1,4 @@
+https://github.com/s-marley/Uno_vu_line   проект
+https://www.youtube.com/watch?v=jhyUqx6inwI  обзор проекта
+
+http://fastled.io/ - библиотека
